@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /*
+   * 中文字體堆疊（CLAUDE.md 視覺方向要求）。
+   * 系統預設字體是給英文排版調的，中文用起來會太瘦或行高太窄，
+   * 所以明確指定中文黑體字型，Windows／macOS／其他系統各自對應到最接近的字體。
+   */
+  --font-sans: system-ui, -apple-system, "Noto Sans TC", "PingFang TC",
+    "Microsoft JhengHei", sans-serif;
+}
+
+/* 深色主題：跟隨系統設定，第一版不做手動切換按鈕（CLAUDE.md 規定） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
