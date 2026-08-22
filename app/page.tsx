@@ -1,21 +1,9 @@
 import Link from "next/link";
-
-/**
- * 階段 1：先用寫死在程式碼裡的假資料撐起首頁結構。
- * 階段 2 會把這份陣列換成「讀取 /content/posts 底下的 Markdown 檔案」的結果，
- * 屆時這裡的資料形狀（title / date / summary / tags）不會變，只是來源從寫死變成讀檔。
- */
-const posts = [
-  {
-    slug: "alishan-sunrise",
-    title: "阿里山看日出的那一天",
-    date: "2026-08-20",
-    summary: "凌晨三點爬起來，只為了那十分鐘。",
-    tags: ["旅行", "台灣"],
-  },
-];
+import { getAllPosts } from "@/lib/posts";
 
 export default function Home() {
+  const posts = getAllPosts();
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <ul className="flex flex-col gap-8">
