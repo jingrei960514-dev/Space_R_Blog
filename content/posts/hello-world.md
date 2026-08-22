@@ -1,7 +1,7 @@
 ---
 title: Hello World
 date: 2026-08-22
-tags: #生活
+tags: [生活]
 summary: 我的部落格誕生啦
 ---
 
