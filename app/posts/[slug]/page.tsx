@@ -7,14 +7,26 @@ export function generateStaticParams() {
   return getPostSlugs().map((slug) => ({ slug }));
 }
 
-// 讓每篇文章的瀏覽器分頁標題顯示文章標題，而不是全站統一的「SPACE R」。
+// 讓每篇文章的瀏覽器分頁標題顯示文章標題，而不是全站統一的「SPACE R」，
+// 並補上分享到社群平台時要用的 Open Graph 資訊（標題、摘要、發布日期、封面圖）。
 export async function generateMetadata({
   params,
 }: PageProps<"/posts/[slug]">) {
   const { slug } = await params;
   try {
     const post = await getPostBySlug(slug);
-    return { title: post.title, description: post.summary };
+    return {
+      title: post.title,
+      description: post.summary,
+      openGraph: {
+        type: "article",
+        title: post.title,
+        description: post.summary,
+        publishedTime: post.date,
+        tags: post.tags,
+        images: post.cover ? [post.cover] : undefined,
+      },
+    };
   } catch {
     return {};
   }

@@ -11,7 +11,10 @@ export async function generateMetadata({
   params,
 }: PageProps<"/tags/[tag]">) {
   const { tag } = await params;
-  return { title: `標籤：${tag}` };
+  return {
+    title: `標籤：${tag}`,
+    description: `標籤「${tag}」底下的所有文章。`,
+  };
 }
 
 export default async function TagPage({ params }: PageProps<"/tags/[tag]">) {

@@ -1,11 +1,33 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SPACE R",
-  description: "記錄學習心得、旅行遊記與生活感悟的個人部落格。",
+  // metadataBase 讓下面（以及各頁面 generateMetadata 回傳）的相對路徑，
+  // 能被自動組成完整網址，例如 og:image、canonical URL。
+  metadataBase: new URL(SITE_URL),
+  // title.template 讓子頁面只要回傳自己的標題（例如文章標題），
+  // 瀏覽器分頁跟搜尋結果實際顯示時會自動補上「| SPACE R」。
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    locale: "zh_TW",
+  },
+  // 讓 RSS 閱讀器／瀏覽器能自動偵測到 /rss.xml 這個訂閱來源。
+  alternates: {
+    types: {
+      "application/rss+xml": "/rss.xml",
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
