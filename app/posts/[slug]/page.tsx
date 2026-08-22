@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 
@@ -49,6 +50,26 @@ export default async function PostPage({
     // 文章欄寬約 36em（CLAUDE.md 中文排版要求），比首頁列表的 max-w-3xl 窄，
     // 避免中文一行太長不好讀。
     <article className="mx-auto max-w-[36em] px-6 py-12">
+      {/*
+        封面圖是可選欄位（frontmatter 沒寫 cover 就不顯示）。
+        用 next/image 而不是 <img>——CLAUDE.md 規定的做法，Next.js 會自動處理
+        壓縮、依裝置尺寸出圖、延遲載入。因為圖片來源是字串路徑（不是 import
+        近來的本地檔案），Next.js 沒辦法自動讀出原始寬高，所以用 fill 搭配
+        固定比例的容器（16:9），讓版面不會因為圖片載入完才跳動。
+      */}
+      {post.cover && (
+        <div className="relative mb-8 aspect-video w-full overflow-hidden rounded">
+          <Image
+            src={post.cover}
+            alt={post.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 700px"
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <p className="mt-2 text-sm text-black/50 dark:text-white/50">
         {post.date}
