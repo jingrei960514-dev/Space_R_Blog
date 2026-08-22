@@ -60,14 +60,56 @@ function readPostMeta(slug: string): PostMeta {
   };
 }
 
+/** rehype 的語法樹節點，只列出我們會用到的欄位（避免額外安裝 @types/hast）。 */
+interface HastNode {
+  type: string;
+  tagName?: string;
+  value?: string;
+  children?: HastNode[];
+}
+
+/**
+ * 在中文字與英文字母/數字相鄰的地方補一個半形空格，例如「用了 Git 這麼多年」
+ * 而不是「用了Git這麼多年」——CLAUDE.md 中文排版要求的「中英數字混排要留間距」。
+ */
+function addCjkLatinSpacing(text: string): string {
+  // 一-龥 是「CJK 統一表意文字」的 Unicode 範圍，涵蓋常用中文字。
+  return text
+    .replace(/([一-龥])([A-Za-z0-9])/g, "$1 $2")
+    .replace(/([A-Za-z0-9])([一-龥])/g, "$1 $2");
+}
+
+/**
+ * 走訪 HTML 語法樹，幫文字節點加上中英間距。
+ * 程式碼區塊（<pre>/<code>）裡的內容跳過不處理，避免把程式碼語法改壞。
+ */
+function walkAndSpaceOut(node: HastNode, insideCode: boolean): void {
+  const nowInsideCode =
+    insideCode || node.tagName === "pre" || node.tagName === "code";
+
+  if (node.type === "text" && node.value && !nowInsideCode) {
+    node.value = addCjkLatinSpacing(node.value);
+  }
+
+  node.children?.forEach((child) => walkAndSpaceOut(child, nowInsideCode));
+}
+
+/** unified 外掛：套用在 remarkRehype 轉出的 HTML 語法樹上。 */
+function rehypeCjkLatinSpacing() {
+  return (tree: HastNode) => {
+    walkAndSpaceOut(tree, false);
+  };
+}
+
 /**
  * 依 slug 讀取單篇文章，回傳 frontmatter + 轉換好的 HTML 內文。
  * 文章頁（/posts/[slug]）用這個函式。
  *
  * remark/rehype 是一條處理鏈（unified）：
- *   remarkParse   Markdown 字串   → Markdown 語法樹
- *   remarkRehype  Markdown 語法樹 → HTML 語法樹
- *   rehypeStringify  HTML 語法樹  → HTML 字串
+ *   remarkParse         Markdown 字串   → Markdown 語法樹
+ *   remarkRehype        Markdown 語法樹 → HTML 語法樹
+ *   rehypeCjkLatinSpacing  在 HTML 語法樹上補中英間距
+ *   rehypeStringify      HTML 語法樹    → HTML 字串
  */
 export async function getPostBySlug(slug: string): Promise<Post> {
   const filePath = path.join(POSTS_DIR, `${slug}.md`);
@@ -77,6 +119,7 @@ export async function getPostBySlug(slug: string): Promise<Post> {
   const processed = await unified()
     .use(remarkParse)
     .use(remarkRehype)
+    .use(rehypeCjkLatinSpacing)
     .use(rehypeStringify)
     .process(content);
 
@@ -99,4 +142,21 @@ export function getAllPosts(): PostMeta[] {
   return getPostSlugs()
     .map(readPostMeta)
     .sort((a, b) => (a.date > b.date ? -1 : 1));
+}
+
+/**
+ * 取得所有文章用過的標籤（不重複），給標籤頁的 generateStaticParams 用，
+ * 決定 build 時要產生哪些 /tags/[tag] 靜態頁面。
+ */
+export function getAllTags(): string[] {
+  const tags = getAllPosts().flatMap((post) => post.tags);
+  return Array.from(new Set(tags));
+}
+
+/**
+ * 取得帶有某個標籤的所有文章，依日期新到舊排序（沿用 getAllPosts 的排序）。
+ * 標籤頁 /tags/[tag] 用這個取得列表內容。
+ */
+export function getPostsByTag(tag: string): PostMeta[] {
+  return getAllPosts().filter((post) => post.tags.includes(tag));
 }

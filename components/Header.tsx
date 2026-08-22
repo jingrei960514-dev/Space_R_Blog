@@ -4,8 +4,8 @@ import Link from "next/link";
  * 共用頁首。
  * 排版採「左右式」：網站標題靠左、導覽列靠右，同一行（你在階段 1 開始前選的方向）。
  *
- * 導覽列目前只放「首頁」一個連結。/about、/tags/[tag] 要到階段 3 才會真的做出頁面，
- * 現在先放連結的話點下去會是 404，所以先不放，等頁面做出來了再一起加。
+ * 導覽列放「首頁」「關於」兩個連結。/tags/[tag] 沒有列表頁（CLAUDE.md 沒有規劃
+ * 標籤索引頁），只能從文章上的標籤點進去，所以不放在導覽列。
  */
 export default function Header() {
   return (
@@ -16,6 +16,7 @@ export default function Header() {
         </Link>
         <nav className="flex gap-4 text-sm">
           <Link href="/">首頁</Link>
+          <Link href="/about">關於</Link>
         </nav>
       </div>
     </header>
