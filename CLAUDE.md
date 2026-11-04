@@ -123,4 +123,19 @@ cover: /images/alishan-sunrise.jpg
 - **階段 3**：首頁列表 + 標籤頁 + 關於頁 + 樣式
 - **階段 4**：SEO metadata + sitemap + RSS + 部署說明
 
-目前進度：尚未開始，準備進入階段 1。
+## 目前進度
+
+第一版（階段 1–4）已全部完成。
+
+- [x] 階段 1：專案骨架 + 共用 layout + 寫死內容的首頁與文章頁
+- [x] 階段 2：Markdown 解析系統 + 動態路由 + 兩篇測試文章
+- [x] 階段 3：首頁列表 + 標籤頁 + 關於頁 + 樣式
+- [x] 階段 4：SEO metadata + sitemap + RSS + 部署說明
+
+第一版完成後的調整：
+
+- 移除兩篇測試文章，新增第一篇正式文章 `hello-world.md`
+- 文章頁支援 frontmatter 的 `cover` 封面圖（使用 `next/image`）
+- 加入 Vercel Analytics（`@vercel/analytics`）
+
+下一步：尚未決定，待作者規劃第二版範圍。
